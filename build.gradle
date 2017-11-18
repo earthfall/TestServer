@@ -3,10 +3,11 @@ version '0.0.1-SNAPSHOT'
 
 buildscript {
     repositories {
+        jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.2.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}")
     }
 }
 
@@ -21,12 +22,12 @@ repositories {
 }
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web") {
+    implementation("org.springframework.boot:spring-boot-starter-web") {
         exclude group: "org.springframework.boot", module: "spring-boot-starter-tomcat"
     }
-    compile("org.springframework.boot:spring-boot-starter-jetty")
-    compile "org.projectlombok:lombok:1.16.10"
+    implementation("org.springframework.boot:spring-boot-starter-jetty")
+    implementation "org.projectlombok:lombok:${lombok_version}"
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile("org.springframework.boot:spring-boot-starter-test")
+    testImplementation group: 'junit', name: 'junit', version: junit_version
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
