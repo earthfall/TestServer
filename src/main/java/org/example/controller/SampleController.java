@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.example.aop.annotations.LogRequest;
 import org.example.config.AppConfig;
 import org.example.entity.PushDataEntity;
 import org.example.entity.PushEntity;
@@ -7,18 +8,15 @@ import org.example.entity.PushNotificationEntity;
 import org.example.service.DeviceNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
-import static org.springframework.http.HttpStatus.OK;
 
 @RestController
+@LogRequest
 public class SampleController {
 
     @Autowired
@@ -58,7 +56,7 @@ public class SampleController {
     }
 
     @PostMapping("/send")
-    public ResponseEntity<PushEntity> send() throws ExecutionException, InterruptedException {
+    public CompletableFuture<PushEntity> send() {
         PushEntity entity = PushEntity.builder()
                 .notification(PushNotificationEntity.builder()
                         .title("humanpoc notification")
@@ -73,10 +71,6 @@ public class SampleController {
                 .priority("high")
                 .build();
 
-        CompletableFuture<PushEntity> pushNotification = deviceNotificationService.send(new HttpEntity<>(entity));
-        CompletableFuture.allOf(pushNotification)
-                .join();
-
-        return new ResponseEntity<>(pushNotification.get(), OK);
+        return deviceNotificationService.send(new HttpEntity<>(entity));
     }
 }

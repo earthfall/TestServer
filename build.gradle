@@ -1,8 +1,8 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '2.0.4.RELEASE'
+    id 'org.springframework.boot' version '2.0.5.RELEASE'
     id 'io.spring.dependency-management' version '1.0.6.RELEASE'
-    id 'com.google.cloud.tools.jib' version '0.9.8'
+    id 'com.google.cloud.tools.jib' version '0.9.11'
     id 'com.simplid.gradle.apidoc' version '0.0.2'
 }
 
@@ -12,7 +12,7 @@ description 'REST API documentation'
 
 dependencyManagement {
     imports {
-        mavenBom 'org.springframework.boot:spring-boot-dependencies:2.0.4.RELEASE'
+        mavenBom 'org.springframework.boot:spring-boot-dependencies:2.0.5.RELEASE'
     }
 
 }
@@ -29,6 +29,8 @@ dependencies {
         exclude group: "org.springframework.boot", module: "spring-boot-starter-tomcat"
     }
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-undertow'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
+    
     implementation group: 'org.projectlombok', name: 'lombok'
 
     testImplementation group: 'junit', name: 'junit', version: junit_version

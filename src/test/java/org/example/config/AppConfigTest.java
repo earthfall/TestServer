@@ -18,12 +18,12 @@ public class AppConfigTest {
     private AppConfig appConfig;
 
     @Test
-    public void getId() throws Exception {
+    public void getId() {
         assertThat(appConfig.getId(), is(1));
     }
 
     @Test
-    public void getGreeting() throws Exception {
+    public void getGreeting() {
         assertThat(appConfig.getGreeting(), is("Hello"));
     }
 
