@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.example.entity.PushEntity;
 import org.example.service.DeviceNotificationService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +35,7 @@ public class SampleControllerTest {
     public void testHello() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/hello/world").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string(equalTo("Hello world!")));
+                .andExpect(content().string(equalTo("Test world!")));
     }
 
     @Test
@@ -43,6 +44,6 @@ public class SampleControllerTest {
                 .andExpect(status().isOk());
 
 
-        verify(deviceNotificationService).send(any(HttpEntity.class));
+        verify(deviceNotificationService).send(any(PushEntity.class));
     }
 }

@@ -3,15 +3,14 @@ package org.example.config;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTestContextBootstrapper;
-import org.springframework.test.context.BootstrapWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@BootstrapWith(SpringBootTestContextBootstrapper.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class AppConfigTest {
 
     @Autowired
@@ -19,12 +18,12 @@ public class AppConfigTest {
 
     @Test
     public void getId() {
-        assertThat(appConfig.getId(), is(1));
+        assertThat(appConfig.getId(), is(2));
     }
 
     @Test
     public void getGreeting() {
-        assertThat(appConfig.getGreeting(), is("Hello"));
+        assertThat(appConfig.getGreeting(), is("Test"));
     }
 
 }
