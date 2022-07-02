@@ -1,4 +1,4 @@
-package org.example.entity;
+package org.example.push.entity;
 
 import lombok.Builder;
 import lombok.Getter;

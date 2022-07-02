@@ -1,18 +1,16 @@
-package org.example.controller;
+package org.example.push;
 
 import lombok.RequiredArgsConstructor;
 import org.example.aop.annotations.LogRequest;
 import org.example.config.AppConfig;
-import org.example.entity.PushDataEntity;
-import org.example.entity.PushEntity;
-import org.example.entity.PushNotificationEntity;
-import org.example.service.DeviceNotificationService;
+import org.example.push.entity.PushDataEntity;
+import org.example.push.entity.PushEntity;
+import org.example.push.entity.PushNotificationEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.concurrent.CompletableFuture;
+import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @RestController
@@ -54,7 +52,7 @@ public class SampleController {
     }
 
     @PostMapping("/send")
-    public CompletableFuture<PushEntity> send() {
+    public Mono<PushEntity> send() {
         PushEntity entity = PushEntity.builder()
                 .notification(PushNotificationEntity.builder()
                         .title("humanpoc notification")

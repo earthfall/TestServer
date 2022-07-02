@@ -4,3 +4,7 @@ test:
 
 fibase:
   api-url: https://fcm.googleapis.com/fcm/send
+
+management:
+  server:
+    port: 8081

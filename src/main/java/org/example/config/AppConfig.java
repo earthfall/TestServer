@@ -1,17 +1,14 @@
 package org.example.config;
 
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConstructorBinding;
 
-@Getter
-@Setter
-@Component
+@Value
+@ConstructorBinding
 @ConfigurationProperties(prefix="test")
 public class AppConfig {
 
-    private int id;
-    private String greeting;
+    int id;
+    String greeting;
 }

@@ -1,15 +1,11 @@
 package org.example.config;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 public class AppConfigTest {
 
@@ -18,12 +14,11 @@ public class AppConfigTest {
 
     @Test
     public void getId() {
-        assertThat(appConfig.getId(), is(2));
+        assertThat(appConfig.getId()).isEqualTo(2);
     }
 
     @Test
     public void getGreeting() {
-        assertThat(appConfig.getGreeting(), is("Test"));
+        assertThat(appConfig.getGreeting()).isEqualTo("Test");
     }
-
 }

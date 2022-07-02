@@ -1,65 +1,50 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '2.1.1.RELEASE'
-    id 'io.spring.dependency-management' version '1.0.6.RELEASE'
-    id 'com.google.cloud.tools.jib' version '0.9.11'
-    id 'com.simplid.gradle.apidoc' version '0.0.2'
+    id 'org.springframework.boot' version '2.7.1'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'org.asciidoctor.convert' version '1.5.8'
 }
 
 group 'testserver'
-version '0.0.1-SNAPSHOT'
-description 'REST API documentation'
+version '0.0.2-SNAPSHOT'
+description 'REST API Test'
 
-dependencyManagement {
-    imports {
-        mavenBom 'org.springframework.boot:spring-boot-dependencies:2.0.5.RELEASE'
-    }
-
-}
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 repositories {
     mavenCentral()
 }
 
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+ext {
+    set('snippetsDir', file("build/generated-snippets"))
+}
+
 dependencies {
-    implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-web') {
-        exclude group: "org.springframework.boot", module: "spring-boot-starter-tomcat"
-    }
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-undertow'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
-    
-    implementation group: 'org.projectlombok', name: 'lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
-    testImplementation group: 'junit', name: 'junit', version: junit_version
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient'
 }
 
-bootJar {
-    baseName = 'test-docker'
-    version =  project.version
+tasks.named('test') {
+    outputs.dir snippetsDir
+    useJUnitPlatform()
 }
 
-jib {
-    from.image = 'openjdk:8-jdk-alpine'
-    to.image = "${project.group}/${bootJar.baseName}"
-    container {
-        args = ['-Djava.security.egd=file:/dev/./urandom']
-        ports = ['8080']
-    }
-}
-
-apidoc {
-    exec "apidoc.cmd"
-    inputDir "src/main/java/org/example/controller"
-    outputDir "$project.buildDir/resources/main/doc"
-    include ".java"
-    include ".kt"
-    exclude ".scala"
-    exclude ".js"
-//    template "/path/to/template"
-//    configDir "src/main/doc"
-    generateConfig true
+tasks.named('asciidoctor') {
+    inputs.dir snippetsDir
+    dependsOn test
 }
