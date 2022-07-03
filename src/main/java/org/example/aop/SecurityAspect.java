@@ -29,7 +29,6 @@ public class SecurityAspect {
         String permission = hasPermission.value();
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         String user = getUser(signature.getMethod(), joinPoint.getArgs());
-        log.debug("BBB " + permission + ", " + user);
 
         return securityEvaluator.confirmPermission(
             user,
