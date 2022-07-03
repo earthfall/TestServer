@@ -12,7 +12,7 @@ import reactor.test.StepVerifier;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
-@WebFluxTest
+@WebFluxTest(SampleController.class)
 public class SampleControllerTest {
 
     @Autowired
