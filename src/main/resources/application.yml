@@ -2,7 +2,7 @@ test:
   id: 1
   greeting: Hello
 
-fibase:
+firebase:
   api-url: https://fcm.googleapis.com/fcm/send
 
 management:
