@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public interface Transformable<T> extends Cloneable {
+public interface Transformable<T> {
 
     T deepCopy();
 

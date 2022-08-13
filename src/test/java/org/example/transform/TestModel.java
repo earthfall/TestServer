@@ -6,24 +6,19 @@ import org.example.aop.annotations.TransformData;
 import org.example.config.Transformable;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class TestModel implements Transformable<TestModel> {
     private int val1;
     @TransformData
     private String val2;
     private Inner val3;
 
-    @Override
     public TestModel deepCopy() {
-        try {
-            return (TestModel) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError(e);
-        }
+        return toBuilder().build();
     }
 
     @Data
-    @Builder
+    @Builder(toBuilder = true)
     static class Inner implements Transformable<Inner> {
         @TransformData
         private String val4;
@@ -31,11 +26,7 @@ public class TestModel implements Transformable<TestModel> {
 
         @Override
         public Inner deepCopy() {
-            try {
-                return (Inner) super.clone();
-            } catch (CloneNotSupportedException e) {
-                throw new AssertionError(e);
-            }
+            return toBuilder().build();
         }
     }
 }
