@@ -2,6 +2,7 @@ package org.example.config;
 
 import org.example.aop.annotations.TransformData;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,19 +13,20 @@ public interface Transformable<T> {
     T deepCopy();
 
     default T transformData() throws IllegalAccessException {
+        var handle = MethodHandles.lookup();
+
         var target = deepCopy();
 
-        for (Field field : getAllFields(target.getClass())) {
-            field.setAccessible(true);
+        var privateLookup = MethodHandles.privateLookupIn(target.getClass(), handle);
 
-            var type = field.getType();
-            var object = field.get(target);
-            if (type == String.class) {
-                if (hasTransformDataAnnotation(field)) {
-                    field.set(target, transformString((String) object));
-                }
-            } else if (Transformable.class.isAssignableFrom(object.getClass())) {
-                field.set(target, ((Transformable<?>) object).transformData());
+        for (Field field : getAllFields(target.getClass())) {
+            var varHandle = privateLookup.unreflectVarHandle(field);
+
+            var object = varHandle.get(target);
+            if (object instanceof String && hasTransformDataAnnotation(field)) {
+                varHandle.set(target, transformString((String) object));
+            } else if (object instanceof Transformable) {
+                varHandle.set(target, ((Transformable<?>) object).transformData());
             }
         }
 
