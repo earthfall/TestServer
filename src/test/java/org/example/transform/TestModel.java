@@ -3,7 +3,6 @@ package org.example.transform;
 import lombok.Builder;
 import lombok.Data;
 import org.example.aop.annotations.TransformData;
-import org.example.config.Transformable;
 
 @Data
 @Builder(toBuilder = true)
