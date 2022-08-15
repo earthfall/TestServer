@@ -1,50 +1,31 @@
 package org.example.transform;
 
-import lombok.SneakyThrows;
-import org.example.aop.annotations.TransformData;
-
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
-public interface Transformable<T> {
+public interface Transformable<T extends Transformable<T>> {
 
     T deepCopy();
 
-    @SneakyThrows(IllegalAccessException.class)
-    static Set<TransformItem> transformDataInfo(Class<?> clazz) {
-        var handle = MethodHandles.lookup();
-        var privateLookup = MethodHandles.privateLookupIn(clazz, handle);
-
-        return getAllFields(clazz).stream()
-            .map(field -> transformItem(privateLookup, field))
-            .collect(Collectors.toSet());
+    default T transformData(Function<Class<?>, Set<TransformItem>> typeProvider, Function<String, String> transformer) throws IllegalAccessException {
+        return transformData(typeProvider, transformer, typeProvider.apply(getClass()));
     }
 
-    @SneakyThrows(IllegalAccessException.class)
-    private static TransformItem transformItem(MethodHandles.Lookup privateLookup, Field field) {
-        return new TransformItem(privateLookup.unreflectVarHandle(field), hasTransformDataAnnotation(field));
-    }
+    private T transformData(
+        Function<Class<?>, Set<TransformItem>> typeProvider, Function<String, String> transformer,
+        Set<TransformItem> transforms
+    ) throws IllegalAccessException {
+        for (TransformItem item : transforms) {
+            var varHandle = item.getVarHandle();
+            var object = varHandle.get(this);
 
-    static String transformString(String value) {
-        return "transformed " + value;
-    }
-
-    private static List<Field> getAllFields(Class<?> clazz) {
-        if (clazz == null) {
-            return Collections.emptyList();
+            if (object instanceof String && item.isTransformDataAnnotation()) {
+                varHandle.set(this, transformer.apply((String) object));
+            } else if (object instanceof Transformable) {
+                varHandle.set(this, ((Transformable<?>) object).transformData(typeProvider, transformer));
+            }
         }
 
-        List<Field> result = new ArrayList<>(getAllFields(clazz.getSuperclass()));
-        result.addAll(List.of(clazz.getDeclaredFields()));
-        return result;
-    }
-
-    private static boolean hasTransformDataAnnotation(Field field) {
-        return field.isAnnotationPresent(TransformData.class);
+        return (T) this;
     }
 }
