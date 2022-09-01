@@ -1,3 +1,11 @@
 test:
   id: 2
   greeting: Test
+
+amazon:
+  aws:
+    access-key: "test-key"
+    secret-key: "test-secret"
+  dynamodb:
+    endpoint: http://localhost:8000
+    region: us-east-1
