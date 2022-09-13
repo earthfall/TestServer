@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
     <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout
-                    pattern="%d [%t] %-5level %logger{36} - %msg%n%throwable"/>
-        </Console>
+        <SpringProfile name="!local">
+            <Console name="Console" target="SYSTEM_OUT">
+                <PatternLayout
+                        pattern="%d [%t] %-5level %logger{36} - %msg%n%throwable{1}"/>
+            </Console>
+        </SpringProfile>
+        <SpringProfile name="local">
+            <Console name="Console" target="SYSTEM_OUT">
+                <PatternLayout
+                        pattern="%d [%t] %-5level %logger{36} - %msg%n%throwable"/>
+            </Console>
+        </SpringProfile>
     </Appenders>
 
     <Loggers>
