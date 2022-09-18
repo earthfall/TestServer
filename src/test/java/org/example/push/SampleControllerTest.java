@@ -1,5 +1,6 @@
 package org.example.push;
 
+import org.example.config.AppProperties;
 import org.example.push.entity.PushEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,7 @@ import reactor.test.StepVerifier;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
-@WebFluxTest(SampleController.class)
+@WebFluxTest({SampleController.class, AppProperties.class})
 public class SampleControllerTest {
 
     @Autowired
@@ -24,25 +25,25 @@ public class SampleControllerTest {
     @Test
     public void testHello() {
         StepVerifier.create(
-                        webClient.get()
-                                .uri("/hello/world")
-                                .accept(MediaType.APPLICATION_JSON)
-                                .exchange()
-                                .expectStatus().isOk()
-                                .returnResult(String.class)
-                                .getResponseBody()
-                )
-                .expectNext("Test world!")
-                .verifyComplete();
+                webClient.get()
+                    .uri("/hello/world")
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isOk()
+                    .returnResult(String.class)
+                    .getResponseBody()
+            )
+            .expectNext("Test world!")
+            .verifyComplete();
     }
 
     @Test
     public void testSend() {
         webClient.post()
-                .uri("/send")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk();
+            .uri("/send")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk();
 
         verify(deviceNotificationService).send(any(PushEntity.class));
     }

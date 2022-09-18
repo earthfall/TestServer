@@ -7,18 +7,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-public class AppConfigTest {
+public class AppPropertiesTest {
 
     @Autowired
-    private AppConfig appConfig;
+    private AppProperties appProperties;
 
     @Test
     public void getId() {
-        assertThat(appConfig.getId()).isEqualTo(2);
+        assertThat(appProperties.id()).isEqualTo(2);
     }
 
     @Test
     public void getGreeting() {
-        assertThat(appConfig.getGreeting()).isEqualTo("Test");
+        assertThat(appProperties.greeting()).isEqualTo("Test");
     }
 }

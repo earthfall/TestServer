@@ -1,14 +1,11 @@
 package org.example;
 
-import org.example.config.AppConfig;
-import org.example.config.AwsProperties;
-import org.example.config.FirebaseConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 @SpringBootApplication
-@EnableConfigurationProperties({AppConfig.class, FirebaseConfig.class, AwsProperties.class})
+@ConfigurationPropertiesScan("org.example.config")
 public class Application {
 
     public static void main(String[] args) {
