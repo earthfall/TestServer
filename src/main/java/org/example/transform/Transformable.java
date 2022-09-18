@@ -16,13 +16,13 @@ public interface Transformable<T extends Transformable<T>> {
         Set<TransformItem> transforms
     ) throws IllegalAccessException {
         for (TransformItem item : transforms) {
-            var varHandle = item.getVarHandle();
+            var varHandle = item.varHandle();
             var object = varHandle.get(this);
 
-            if (object instanceof String && item.isTransformDataAnnotation()) {
-                varHandle.set(this, transformer.apply((String) object));
-            } else if (object instanceof Transformable) {
-                varHandle.set(this, ((Transformable<?>) object).transformData(typeProvider, transformer));
+            if (object instanceof String strObject && item.transformDataAnnotation()) {
+                varHandle.set(this, transformer.apply(strObject));
+            } else if (object instanceof Transformable<?> transformableObject) {
+                varHandle.set(this, transformableObject.transformData(typeProvider, transformer));
             }
         }
 

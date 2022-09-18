@@ -26,9 +26,9 @@ public class SecurityAspect {
 
     @Around(value = "@annotation(hasPermission)", argNames = "hasPermission")
     public <T> Mono<T> handlePermission(ProceedingJoinPoint joinPoint, HasPermission hasPermission) {
-        String permission = hasPermission.value();
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        String user = getUser(signature.getMethod(), joinPoint.getArgs());
+        var permission = hasPermission.value();
+        var signature = (MethodSignature) joinPoint.getSignature();
+        var user = getUser(signature.getMethod(), joinPoint.getArgs());
 
         return securityEvaluator.confirmPermission(
             user,
@@ -38,7 +38,7 @@ public class SecurityAspect {
     }
 
     private String getUser(Method method, Object[] args) {
-        Annotation[][] annotations = method.getParameterAnnotations();
+        var annotations = method.getParameterAnnotations();
         for (int i = 0; i < method.getParameterCount(); i++) {
             if (hasUserAnnotation(annotations[i])) {
                 return (String) args[i];

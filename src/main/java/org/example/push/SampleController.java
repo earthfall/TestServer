@@ -2,7 +2,7 @@ package org.example.push;
 
 import lombok.RequiredArgsConstructor;
 import org.example.aop.annotations.LogRequest;
-import org.example.config.AppConfig;
+import org.example.config.AppProperties;
 import org.example.push.entity.PushDataEntity;
 import org.example.push.entity.PushEntity;
 import org.example.push.entity.PushNotificationEntity;
@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 @LogRequest
 public class SampleController {
 
-    private final AppConfig appConfig;
+    private final AppProperties appProperties;
 
     private final DeviceNotificationService deviceNotificationService;
 
@@ -48,24 +48,24 @@ public class SampleController {
      */
     @GetMapping("/hello/{name}")
     public String hello(@PathVariable String name) {
-        return appConfig.getGreeting() + ' ' + name + "!";
+        return appProperties.greeting() + ' ' + name + "!";
     }
 
     @PostMapping("/send")
     public Mono<PushEntity> send() {
-        PushEntity entity = PushEntity.builder()
-                .notification(PushNotificationEntity.builder()
-                        .title("humanpoc notification")
-                        .body("header")
-                        .build()
-                )
-                .data(PushDataEntity.builder()
-                        .entry("test")
-                        .build()
-                )
-                .to("/server/send")
-                .priority("high")
-                .build();
+        var entity = PushEntity.builder()
+            .notification(PushNotificationEntity.builder()
+                .title("humanpoc notification")
+                .body("header")
+                .build()
+            )
+            .data(PushDataEntity.builder()
+                .entry("test")
+                .build()
+            )
+            .to("/server/send")
+            .priority("high")
+            .build();
 
         return deviceNotificationService.send(entity);
     }

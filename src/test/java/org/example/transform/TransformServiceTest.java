@@ -1,5 +1,6 @@
 package org.example.transform;
 
+import org.example.config.FirebaseProperties;
 import org.example.push.DeviceNotificationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@WebFluxTest({DeviceNotificationService.class, Transformer.class})
+@WebFluxTest({DeviceNotificationService.class, Transformer.class, FirebaseProperties.class})
 public class TransformServiceTest {
 
     @Autowired
@@ -15,7 +16,7 @@ public class TransformServiceTest {
 
     @Test
     public void testTransform() throws IllegalAccessException {
-        TestModel model = TestModel.builder()
+        var model = TestModel.builder()
             .val1(1)
             .val2("2")
             .val3(
@@ -44,18 +45,18 @@ public class TransformServiceTest {
 
     @Test
     public void testTransformMultiple() throws IllegalAccessException {
-        TestModel model = TestModel.builder()
+        var model = TestModel.builder()
             .val1(1)
             .val2("2")
             .build();
 
-        TestModel2 model2 = TestModel2.builder()
+        var model2 = TestModel2.builder()
             .val1(1)
             .val2("2")
             .val3("3")
             .build();
 
-        TestModel2 model3 = TestModel2.builder()
+        var model3 = TestModel2.builder()
             .val1(11)
             .val2("12")
             .val3("13")
@@ -79,12 +80,9 @@ public class TransformServiceTest {
             .build();
 
         var transformService = new TransformService(transformer);
-        var result = transformService.transform(model);
-        var result2 = transformService.transform(model2);
-        var result3 = transformService.transform(model3);
 
-        assertThat(result).isEqualTo(expect);
-        assertThat(result2).isEqualTo(expect2);
-        assertThat(result3).isEqualTo(expect3);
+        assertThat(transformService.transform(model)).isEqualTo(expect);
+        assertThat(transformService.transform(model2)).isEqualTo(expect2);
+        assertThat(transformService.transform(model3)).isEqualTo(expect3);
     }
 }

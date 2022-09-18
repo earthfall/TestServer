@@ -26,8 +26,8 @@ public class DynamoDbConfig {
     AwsCredentialsProvider awsCredentialsProvider(AwsProperties awsProperties) {
         return StaticCredentialsProvider.create(
             AwsBasicCredentials.create(
-                awsProperties.getAws().getAccessKey(),
-                awsProperties.getAws().getSecretKey()
+                awsProperties.aws().accessKey(),
+                awsProperties.aws().secretKey()
             )
         );
     }
@@ -35,8 +35,8 @@ public class DynamoDbConfig {
     @Bean
     DynamoDbClient dynamoDbClient(AwsProperties awsProperties) {
         return DynamoDbClient.builder()
-            .region(Region.of(awsProperties.getDynamoDb().getRegion()))
-            .endpointOverride(URI.create(awsProperties.getDynamoDb().getEndpoint()))
+            .region(Region.of(awsProperties.dynamoDb().region()))
+            .endpointOverride(URI.create(awsProperties.dynamoDb().endpoint()))
             .overrideConfiguration(
                 ClientOverrideConfiguration.builder()
                     .retryPolicy(RetryMode.defaultRetryMode())
