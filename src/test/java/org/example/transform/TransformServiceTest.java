@@ -15,7 +15,7 @@ public class TransformServiceTest {
     private Transformer transformer;
 
     @Test
-    public void testTransform() throws IllegalAccessException {
+    public void testTransform() {
         var model = TestModel.builder()
             .val1(1)
             .val2("2")
@@ -44,7 +44,7 @@ public class TransformServiceTest {
     }
 
     @Test
-    public void testTransformMultiple() throws IllegalAccessException {
+    public void testTransformMultiple() {
         var model = TestModel.builder()
             .val1(1)
             .val2("2")
