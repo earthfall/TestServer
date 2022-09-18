@@ -1,31 +1,47 @@
 package org.example.transform;
 
-import java.util.Set;
+import lombok.SneakyThrows;
+
 import java.util.function.Function;
 
+// Transformable should declare default constructor
 public interface Transformable<T extends Transformable<T>> {
 
-    T deepCopy();
-
-    default T transformData(Function<Class<?>, Set<TransformItem>> typeProvider, Function<String, String> transformer) throws IllegalAccessException {
-        return transformData(typeProvider, transformer, typeProvider.apply(getClass()));
+    default T transformedObject(
+        Function<Class<?>, TransformTarget> typeProvider,
+        Function<String, String> transformer
+    ) {
+        return transformedObject(typeProvider, transformer, typeProvider.apply(getClass()));
     }
 
-    private T transformData(
-        Function<Class<?>, Set<TransformItem>> typeProvider, Function<String, String> transformer,
-        Set<TransformItem> transforms
-    ) throws IllegalAccessException {
-        for (TransformItem item : transforms) {
-            var varHandle = item.varHandle();
-            var object = varHandle.get(this);
+    @SneakyThrows(Throwable.class)
+    default T transformedObject(
+        Function<Class<?>, TransformTarget> typeProvider,
+        Function<String, String> transformer,
+        TransformTarget transforms
+    ) {
+        Transformable<?> instance = transforms.creator().get();
 
-            if (object instanceof String strObject && item.transformDataAnnotation()) {
-                varHandle.set(this, transformer.apply(strObject));
-            } else if (object instanceof Transformable<?> transformableObject) {
-                varHandle.set(this, transformableObject.transformData(typeProvider, transformer));
-            }
+        for (TransformItem item : transforms.items()) {
+            var varHandle = item.varHandle();
+            varHandle.set(instance, transformItem(item, varHandle.get(this), typeProvider, transformer));
         }
 
-        return (T) this;
+        return (T) instance;
+    }
+
+    private Object transformItem(
+        TransformItem item,
+        Object field,
+        Function<Class<?>, TransformTarget> typeProvider,
+        Function<String, String> transformer
+    ) {
+        if (field instanceof String strObject && item.transformData()) {
+            return transformer.apply(strObject);
+        } else if (field instanceof Transformable<?> transformableObject) {
+            return transformableObject.transformedObject(typeProvider, transformer);
+        } else {
+            return field;
+        }
     }
 }
