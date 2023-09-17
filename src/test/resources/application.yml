@@ -1,3 +1,12 @@
+spring:
+  main:
+    lazy-initialization: true
+  rsocket:
+    server:
+      port: 7000
+      transport: websocket
+      mapping-path: /
+
 test:
   id: 2
   greeting: Test
