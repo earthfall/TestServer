@@ -1,17 +1,23 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.0.4'
-    id 'io.spring.dependency-management' version '1.1.0'
-    id 'org.asciidoctor.convert' version '1.5.8'
-    id 'com.google.cloud.tools.jib' version '3.2.1'
+    id 'org.springframework.boot' version '3.3.2'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.24'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.9.24'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id 'com.google.cloud.tools.jib' version '3.4.0'
 }
 
 group 'testserver'
-version '0.0.3-SNAPSHOT'
+version '0.0.7'
 description 'REST API Test'
 
-sourceCompatibility = 17
-targetCompatibility = 17
+java {
+    sourceCompatibility = 21
+    targetCompatibility = 21
+}
 
 repositories {
     mavenCentral()
@@ -24,6 +30,7 @@ configurations {
 }
 
 ext {
+    // https://docs.spring.io/spring-boot/appendix/dependency-versions/coordinates.html
     set('snippetsDir', file("build/generated-snippets"))
 }
 
@@ -41,6 +48,15 @@ dependencies {
     implementation 'org.apache.logging.log4j:log4j-spring-boot'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
+    implementation 'io.projectreactor.kotlin:reactor-kotlin-extensions'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect'
+    implementation  'org.jetbrains.kotlinx:kotlinx-coroutines-core'
+    implementation  'org.jetbrains.kotlinx:kotlinx-coroutines-reactive'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
@@ -51,8 +67,16 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient'
     testImplementation 'org.assertj:assertj-core'
+    testImplementation 'app.cash.turbine:turbine:1.0.0'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        freeCompilerArgs = ['-Xjsr305=strict']
+        jvmTarget = '21'
+    }
 }
 
 tasks.named('test') {
@@ -66,8 +90,8 @@ tasks.named('asciidoctor') {
 }
 
 jib {
-    from.image = 'openjdk:17-jdk-alpine'
-    to.image = "${project.group}/${bootJar.baseName}"
+    from.image = 'openjdk:21-jdk-alpine'
+    to.image = "${project.group}/${bootJar.archiveBaseName}"
     container {
         args = ['-Djava.security.egd=file:/dev/./urandom']
         ports = ['8080']

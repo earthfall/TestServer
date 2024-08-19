@@ -18,7 +18,7 @@ import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughputExcee
 import java.net.URI;
 
 @Configuration
-public class DynamoDbConfig {
+public class DynamoDbConfiguration {
 
     boolean throttleDynamoDb = false;
 
