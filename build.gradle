@@ -2,21 +2,21 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.1.3'
-    id 'io.spring.dependency-management' version '1.1.3'
-    id 'org.jetbrains.kotlin.jvm' version '1.8.22'
-    id 'org.jetbrains.kotlin.plugin.spring' version '1.8.22'
+    id 'org.springframework.boot' version '3.3.2'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.24'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.9.24'
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
-    id 'com.google.cloud.tools.jib' version '3.2.1'
+    id 'com.google.cloud.tools.jib' version '3.4.0'
 }
 
 group 'testserver'
-version '0.0.5-SNAPSHOT'
+version '0.0.7'
 description 'REST API Test'
 
 java {
-    sourceCompatibility = 17
-    targetCompatibility = 17
+    sourceCompatibility = 21
+    targetCompatibility = 21
 }
 
 repositories {
@@ -30,6 +30,7 @@ configurations {
 }
 
 ext {
+    // https://docs.spring.io/spring-boot/appendix/dependency-versions/coordinates.html
     set('snippetsDir', file("build/generated-snippets"))
 }
 
@@ -74,7 +75,7 @@ dependencies {
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         freeCompilerArgs = ['-Xjsr305=strict']
-        jvmTarget = '17'
+        jvmTarget = '21'
     }
 }
 
@@ -89,7 +90,7 @@ tasks.named('asciidoctor') {
 }
 
 jib {
-    from.image = 'openjdk:17-jdk-alpine'
+    from.image = 'openjdk:21-jdk-alpine'
     to.image = "${project.group}/${bootJar.archiveBaseName}"
     container {
         args = ['-Djava.security.egd=file:/dev/./urandom']
