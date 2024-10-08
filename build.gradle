@@ -2,16 +2,17 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.2'
+    id 'org.springframework.boot' version '3.3.4'
     id 'io.spring.dependency-management' version '1.1.6'
     id 'org.jetbrains.kotlin.jvm' version '1.9.24'
     id 'org.jetbrains.kotlin.plugin.spring' version '1.9.24'
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id 'com.google.protobuf' version '0.9.4'
     id 'com.google.cloud.tools.jib' version '3.4.0'
 }
 
 group 'testserver'
-version '0.0.7'
+version '0.0.8'
 description 'REST API Test'
 
 java {
@@ -63,6 +64,8 @@ dependencies {
 
     implementation 'software.amazon.awssdk:dynamodb'
 
+    implementation 'com.google.protobuf:protobuf-java:4.28.2'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient'
@@ -76,6 +79,12 @@ tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         freeCompilerArgs = ['-Xjsr305=strict']
         jvmTarget = '21'
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:4.28.2'
     }
 }
 
