@@ -3,6 +3,7 @@ package org.example.transform;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.jspecify.annotations.Nullable;
 import lombok.NoArgsConstructor;
 import org.example.annotation.TransformData;
 
@@ -13,8 +14,8 @@ import org.example.annotation.TransformData;
 public class TestModel implements Transformable<TestModel> {
     private int val1;
     @TransformData
-    private String val2;
-    private Inner val3;
+    private @Nullable String val2;
+    private @Nullable Inner val3;
 
     @Data
     @NoArgsConstructor
@@ -22,7 +23,7 @@ public class TestModel implements Transformable<TestModel> {
     @Builder(toBuilder = true)
     static class Inner implements Transformable<Inner> {
         @TransformData
-        private String val4;
+        private @Nullable String val4;
         private long val5;
     }
 }

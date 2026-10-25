@@ -1,5 +1,6 @@
 package org.example.aop;
 
+import org.jspecify.annotations.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -24,7 +25,7 @@ public class SecurityAspect {
     private final SecurityEvaluator securityEvaluator;
 
     @Around(value = "@annotation(hasPermission)", argNames = "hasPermission")
-    public Object handlePermission(ProceedingJoinPoint joinPoint, HasPermission hasPermission) throws Throwable {
+    public @Nullable Object handlePermission(ProceedingJoinPoint joinPoint, HasPermission hasPermission) throws Throwable {
         var permission = hasPermission.value();
         var signature = (MethodSignature) joinPoint.getSignature();
         var user = getUser(signature.getMethod(), joinPoint.getArgs());
@@ -33,7 +34,7 @@ public class SecurityAspect {
         return joinPoint.proceed();
     }
 
-    private String getUser(Method method, Object[] args) {
+    private @Nullable String getUser(Method method, @Nullable Object[] args) {
         var annotations = method.getParameterAnnotations();
         for (int i = 0; i < method.getParameterCount(); i++) {
             if (hasUserAnnotation(annotations[i])) {

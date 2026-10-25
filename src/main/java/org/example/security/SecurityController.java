@@ -40,13 +40,13 @@ public class SecurityController {
     @HasPermission("test1")
     @GetMapping("/permission-aop/{name}")
     public String helloAop(@User @PathVariable String name) {
-        log.debug("Received aop request with " + name);
+        log.debug("Received aop request with {}", name);
         return securityService.testHello();
     }
 
     @GetMapping(value = "/permission-valid/{name}", produces = MediaType.APPLICATION_PROTOBUF_VALUE)
     public Message helloAopProto(@User @PathVariable String name) {
-        log.debug("Received protobuf request with " + name);
+        log.debug("Received protobuf request with {}", name);
         return Message.newBuilder().setName(securityService.testHello()).build();
     }
 }

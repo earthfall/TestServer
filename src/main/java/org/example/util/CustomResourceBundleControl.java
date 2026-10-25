@@ -1,5 +1,6 @@
 package org.example.util;
 
+import org.jspecify.annotations.Nullable;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.util.List;
@@ -17,7 +18,7 @@ class CustomResourceBundleControl extends ResourceBundle.Control {
     }
 
     @Override
-    public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload) throws IllegalAccessException, InstantiationException, IOException {
+    public @Nullable ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload) throws IllegalAccessException, InstantiationException, IOException {
         if (baseName == null || locale == null || format == null || loader == null) {
             throw new IllegalArgumentException("Wrong bundle parameter");
         }

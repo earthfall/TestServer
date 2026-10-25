@@ -25,6 +25,6 @@ public class LoggingAspect {
     @Before("publicMethod() && annotatedWithLogRequest()")
     public void logMethod(JoinPoint jp) {
         String methodName = jp.getSignature().getName();
-        log.info("Executing method: " + methodName);
+        log.info("Executing method: {}", methodName);
     }
 }

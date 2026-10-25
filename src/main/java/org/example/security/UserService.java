@@ -1,5 +1,6 @@
 package org.example.security;
 
+import org.jspecify.annotations.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
     public static final String PERMISSION = "permission";
 
-    public boolean hasPermission(String user, String permission) {
+    public boolean hasPermission(@Nullable String user, String permission) {
         return PERMISSION.equals(permission);
     }
 }

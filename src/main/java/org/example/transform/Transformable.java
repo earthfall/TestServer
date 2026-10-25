@@ -1,5 +1,6 @@
 package org.example.transform;
 
+import org.jspecify.annotations.Nullable;
 import lombok.SneakyThrows;
 
 import java.util.function.Function;
@@ -30,9 +31,9 @@ public interface Transformable<T extends Transformable<T>> {
         return (T) instance;
     }
 
-    private Object transformItem(
+    private @Nullable Object transformItem(
         TransformItem item,
-        Object field,
+        @Nullable Object field,
         Function<Class<?>, TransformTarget> typeProvider,
         Function<String, String> transformer
     ) {

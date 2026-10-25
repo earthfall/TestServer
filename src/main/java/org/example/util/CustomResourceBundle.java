@@ -1,5 +1,6 @@
 package org.example.util;
 
+import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.io.InputStream;
@@ -10,7 +11,7 @@ import java.util.ResourceBundle;
 
 class CustomResourceBundle extends ResourceBundle {
 
-    private final Map<String, String> resources;
+    private final Map<String, @Nullable String> resources;
     private final Enumeration<String> keyEnumeration;
 
     @SuppressWarnings("unchecked")
@@ -21,7 +22,7 @@ class CustomResourceBundle extends ResourceBundle {
     }
 
     @Override
-    protected String handleGetObject(String key) {
+    protected @Nullable String handleGetObject(String key) {
         return resources.get(key);
     }
 

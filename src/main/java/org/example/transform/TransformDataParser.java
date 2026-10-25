@@ -1,5 +1,6 @@
 package org.example.transform;
 
+import org.jspecify.annotations.Nullable;
 import lombok.SneakyThrows;
 import org.example.annotation.TransformData;
 
@@ -53,7 +54,7 @@ public class TransformDataParser {
         return new TransformItem(privateLookup.unreflectVarHandle(field), hasTransformDataAnnotation(field));
     }
 
-    private static List<Field> getAllFields(Class<?> clazz) {
+    private static List<Field> getAllFields(@Nullable Class<?> clazz) {
         if (clazz == null) {
             return Collections.emptyList();
         }

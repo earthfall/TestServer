@@ -1,5 +1,6 @@
 package org.example.exception;
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -10,13 +11,13 @@ public class GlobalExceptionAdvice {
 
     @ExceptionHandler(NoPermissionException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    String unauthorized(Exception e) {
+    @Nullable String unauthorized(Exception e) {
         return e.getMessage();
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    String genericException(Exception e) {
+    @Nullable String genericException(Exception e) {
         return e.getMessage();
     }
 }
