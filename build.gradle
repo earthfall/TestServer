@@ -1,23 +1,25 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.4'
-    id 'io.spring.dependency-management' version '1.1.6'
-    id 'org.jetbrains.kotlin.jvm' version '1.9.24'
-    id 'org.jetbrains.kotlin.plugin.spring' version '1.9.24'
-    id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id 'org.springframework.boot' version '3.5.16'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.jetbrains.kotlin.jvm' version '2.3.0'
+    id 'org.jetbrains.kotlin.plugin.spring' version '2.3.0'
+    id 'org.asciidoctor.jvm.convert' version '4.0.5'
     id 'com.google.protobuf' version '0.9.4'
-    id 'com.google.cloud.tools.jib' version '3.4.0'
+    id 'com.google.cloud.tools.jib' version '3.4.5'
+    id 'org.graalvm.buildtools.native' version '0.11.1'
 }
 
 group 'testserver'
-version '0.0.8'
+version '0.0.9'
 description 'REST API Test'
 
 java {
-    sourceCompatibility = 21
-    targetCompatibility = 21
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }
 
 repositories {
@@ -67,6 +69,7 @@ dependencies {
     implementation 'com.google.protobuf:protobuf-java:4.28.2'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient'
     testImplementation 'org.assertj:assertj-core'
@@ -75,10 +78,10 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs = ['-Xjsr305=strict']
-        jvmTarget = '21'
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add('-Xjsr305=strict')
+        jvmTarget = JvmTarget.JVM_25
     }
 }
 
@@ -99,7 +102,7 @@ tasks.named('asciidoctor') {
 }
 
 jib {
-    from.image = 'openjdk:21-jdk-alpine'
+    from.image = 'eclipse-temurin:25-jre'
     to.image = "${project.group}/${bootJar.archiveBaseName}"
     container {
         args = ['-Djava.security.egd=file:/dev/./urandom']
