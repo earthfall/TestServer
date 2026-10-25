@@ -78,11 +78,27 @@ dependencies {
 tasks.withType(JavaCompile).configureEach {
     options.errorprone {
         disableAllChecks = true
-        error('NullAway', 'JSpecifyUnrecognizedAnnotationLocation')
+        error('NullAway', 'JSpecifyUnrecognizedAnnotationLocation', 'RequireExplicitNullMarking')
         option('NullAway:OnlyNullMarked', 'true')
         option('NullAway:JSpecifyMode', 'true')
         // Protobuf and Spring AOT sources are generated under build/.
         excludedPaths = '.*/build/.*'
+    }
+}
+
+// Compile-only fixtures verify that the configured compiler checks stay active.
+['Valid', 'Invalid', 'Unmarked'].each { fixture ->
+    tasks.register("compile${fixture}NullnessFixture", JavaCompile) {
+        group = 'verification'
+        description = "Compile the ${fixture.toLowerCase()} nullness verification fixture"
+        source = fileTree("src/nullnessCheck/${fixture.toLowerCase()}") { include '**/*.java' }
+        classpath = sourceSets.main.compileClasspath
+        options.annotationProcessorPath = configurations.annotationProcessor
+        javaCompiler = javaToolchains.compilerFor(java.toolchain)
+        destinationDirectory = layout.buildDirectory.dir("nullnessCheck/${fixture.toLowerCase()}")
+        options.errorprone.enabled = true
+        // Always exercise the checker, including when CI restores Gradle caches.
+        outputs.upToDateWhen { false }
     }
 }
 
