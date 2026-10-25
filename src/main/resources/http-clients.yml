@@ -1,0 +1,8 @@
+spring:
+  http:
+    serviceclient:
+      firebase:
+        base-url: "${firebase.api-url}"
+        default-header:
+          Authorization:
+            - "key=${firebase.server-key}"
