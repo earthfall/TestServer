@@ -2,8 +2,8 @@ package org.example.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.example.aop.annotations.HasPermission;
-import org.example.aop.annotations.User;
+import org.example.annotation.HasPermission;
+import org.example.annotation.User;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -6,8 +6,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.example.aop.annotations.HasPermission;
-import org.example.aop.annotations.User;
+import org.example.annotation.HasPermission;
+import org.example.annotation.User;
 import org.example.security.SecurityEvaluator;
 import org.springframework.stereotype.Component;
 

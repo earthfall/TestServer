@@ -34,7 +34,10 @@ ext {
 }
 
 dependencies {
-    implementation platform('software.amazon.awssdk:bom:2.18.21')
+    implementation platform('software.amazon.awssdk:bom:2.57.3')
+    implementation platform('org.springframework.modulith:spring-modulith-bom:2.1.1')
+
+    implementation 'org.springframework.modulith:spring-modulith-starter-core'
 
     implementation 'org.springframework.boot:spring-boot-starter-aspectj'
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
@@ -55,9 +58,10 @@ dependencies {
 
     implementation 'software.amazon.awssdk:dynamodb'
 
-    implementation 'com.google.protobuf:protobuf-java:4.28.2'
+    implementation 'com.google.protobuf:protobuf-java'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testImplementation 'org.springframework.modulith:spring-modulith-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation 'org.assertj:assertj-core'
@@ -67,7 +71,7 @@ dependencies {
 
 protobuf {
     protoc {
-        artifact = 'com.google.protobuf:protoc:4.28.2'
+        artifact = "com.google.protobuf:protoc:${dependencyManagement.importedProperties['protobuf-java.version']}"
     }
 }
 
