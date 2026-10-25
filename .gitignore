@@ -1,20 +1,43 @@
-# Created by .ignore support plugin (hsz.mobi)
-### Java template
-*.class
-
-# Mobile Tools for Java (J2ME)
-.idea/
-
-*.iml
-
-# Package Files #
-*.jar
-*.war
-*.ear
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-
+# Gradle build state and outputs
 .gradle/
 build/
+bin/
 out/
+
+# Keep the Gradle Wrapper executable dependency versioned
+!gradle/wrapper/gradle-wrapper.jar
+
+# Java compiler output and JVM diagnostics
+*.class
+hs_err_pid*
+replay_pid*
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse / Buildship
+.classpath
+.project
+.settings/
+.factorypath
+
+# Visual Studio Code
+.vscode/
+
+# Local environment and logs
+.env
+.env.*
+!.env.example
+*.log
+logs/
+
+# Operating-system generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Machine-specific graphics-driver logs
+/NVIDIA Corporation/
