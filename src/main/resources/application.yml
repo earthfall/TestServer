@@ -6,20 +6,16 @@ spring:
       enabled: true
 
 amazon:
-  aws:
-    access-key: "test-key"
-    secret-key: "test-secret"
   dynamo-db:
-    endpoint: http://localhost:8000
-    region: us-east-1
+    region: ${AWS_REGION:us-east-1}
 
 test:
   id: 1
   greeting: Hello
 
 firebase:
-  api-url: ${FIREBASE_API_URL:https://fcm.googleapis.com/fcm/send}
-  server-key: ${FIREBASE_SERVER_KEY:}
+  project-id: ${FIREBASE_PROJECT_ID:demo-testserver}
+  api-url: ${FIREBASE_API_URL:https://fcm.googleapis.com}
 
 management:
   server:

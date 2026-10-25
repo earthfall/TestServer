@@ -10,6 +10,6 @@ public class UserService {
     public static final String PERMISSION = "permission";
 
     public boolean hasPermission(@Nullable String user, String permission) {
-        return PERMISSION.equals(permission);
+        return user != null && !user.isBlank() && PERMISSION.equals(permission);
     }
 }

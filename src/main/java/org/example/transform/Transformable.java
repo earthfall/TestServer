@@ -1,13 +1,13 @@
 package org.example.transform;
 
 import org.jspecify.annotations.Nullable;
-import lombok.SneakyThrows;
 
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.function.Function;
 
-// Transformable should declare default constructor
+// Mutable POJOs with a no-argument constructor; collections remain shallow copies.
 public interface Transformable<T extends Transformable<T>> {
-
     default T transformedObject(
         Function<Class<?>, TransformTarget> typeProvider,
         Function<String, String> transformer
@@ -15,34 +15,47 @@ public interface Transformable<T extends Transformable<T>> {
         return transformedObject(typeProvider, transformer, typeProvider.apply(getClass()));
     }
 
-    @SneakyThrows(Throwable.class)
+    @SuppressWarnings("unchecked")
     default T transformedObject(
         Function<Class<?>, TransformTarget> typeProvider,
         Function<String, String> transformer,
         TransformTarget transforms
     ) {
-        Transformable<?> instance = transforms.creator().get();
+        return (T) copy(typeProvider, transformer, transforms, new IdentityHashMap<>());
+    }
 
-        for (TransformItem item : transforms.items()) {
-            var varHandle = item.varHandle();
-            varHandle.set(instance, transformItem(item, varHandle.get(this), typeProvider, transformer));
+    private Transformable<?> copy(
+        Function<Class<?>, TransformTarget> typeProvider,
+        Function<String, String> transformer,
+        TransformTarget transforms,
+        Map<Transformable<?>, Transformable<?>> copies
+    ) {
+        var existing = copies.get(this);
+        if (existing != null) {
+            return existing;
         }
-
-        return (T) instance;
+        var instance = transforms.creator().get();
+        copies.put(this, instance);
+        for (var item : transforms.items()) {
+            var handle = item.varHandle();
+            handle.set(instance, transformItem(item, handle.get(this), typeProvider, transformer, copies));
+        }
+        return instance;
     }
 
     private @Nullable Object transformItem(
         TransformItem item,
         @Nullable Object field,
         Function<Class<?>, TransformTarget> typeProvider,
-        Function<String, String> transformer
+        Function<String, String> transformer,
+        Map<Transformable<?>, Transformable<?>> copies
     ) {
-        if (field instanceof String strObject && item.transformData()) {
-            return transformer.apply(strObject);
-        } else if (field instanceof Transformable<?> transformableObject) {
-            return transformableObject.transformedObject(typeProvider, transformer);
-        } else {
-            return field;
+        if (field instanceof String value && item.transformData()) {
+            return transformer.apply(value);
         }
+        if (field instanceof Transformable<?> value) {
+            return value.copy(typeProvider, transformer, typeProvider.apply(value.getClass()), copies);
+        }
+        return field;
     }
 }

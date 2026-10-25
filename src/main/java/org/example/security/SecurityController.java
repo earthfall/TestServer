@@ -46,6 +46,7 @@ public class SecurityController {
 
     @GetMapping(value = "/permission-valid/{name}", produces = MediaType.APPLICATION_PROTOBUF_VALUE)
     public Message helloAopProto(@User @PathVariable String name) {
+        securityEvaluator.checkPermission(name, UserService.PERMISSION);
         log.debug("Received protobuf request with {}", name);
         return Message.newBuilder().setName(securityService.testHello()).build();
     }

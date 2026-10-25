@@ -1,13 +1,16 @@
 package org.example.push.entity;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import org.jspecify.annotations.Nullable;
 
 @Builder
 public record PushEntity(
-    @Nullable PushNotificationEntity notification,
-    @Nullable PushDataEntity data,
-    String to,
-    @Nullable String priority
+    @Valid @Nullable PushNotificationEntity notification,
+    @Valid @Nullable PushDataEntity data,
+    @NotBlank @Pattern(regexp = "(?!/topics/$)\\S+") String to,
+    @Nullable @Pattern(regexp = "high|normal") String priority
 ) {
 }

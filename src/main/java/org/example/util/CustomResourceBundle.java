@@ -6,19 +6,28 @@ import tools.jackson.databind.json.JsonMapper;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 class CustomResourceBundle extends ResourceBundle {
+    private static final JsonMapper MAPPER = JsonMapper.builder().build();
+    private final Map<String, String> resources;
 
-    private final Map<String, @Nullable String> resources;
-    private final Enumeration<String> keyEnumeration;
-
-    @SuppressWarnings("unchecked")
-    CustomResourceBundle(InputStream is) {
-        var objectMapper = JsonMapper.builder().build();
-        resources = objectMapper.readValue(is, Map.class);
-        keyEnumeration = Collections.enumeration(resources.keySet());
+    CustomResourceBundle(InputStream stream) {
+        var root = MAPPER.readTree(stream);
+        if (root == null || !root.isObject()) {
+            throw new IllegalArgumentException("Resource bundle must be a JSON object");
+        }
+        var values = new LinkedHashMap<String, String>();
+        for (var property : root.properties()) {
+            if (!property.getValue().isString()) {
+                throw new IllegalArgumentException("Resource bundle values must be strings: " + property.getKey());
+            }
+            values.put(property.getKey(), property.getValue().asString());
+        }
+        resources = Map.copyOf(values);
     }
 
     @Override
@@ -28,6 +37,11 @@ class CustomResourceBundle extends ResourceBundle {
 
     @Override
     public Enumeration<String> getKeys() {
-        return keyEnumeration;
+        var keys = new LinkedHashSet<>(resources.keySet());
+        var parentBundle = parent;
+        if (parentBundle != null) {
+            keys.addAll(Collections.list(parentBundle.getKeys()));
+        }
+        return Collections.enumeration(keys);
     }
 }
