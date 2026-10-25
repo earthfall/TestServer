@@ -5,12 +5,29 @@ and test Java sources. Nullness violations and unrecognized JSpecify annotation
 locations are compiler errors, so the existing CI `./gradlew build` step fails
 on violations. Other Error Prone checks are disabled to keep this check focused.
 
+`RequireExplicitNullMarking` also fails compilation if a handwritten top-level
+class has no explicit class or package nullness contract. New packages must add
+`package-info.java`; `@NullUnmarked` is an explicit opt-out, not an implicit
+fallback.
+
 Run locally with Java 25:
 
 ```sh
 ./gradlew compileJava compileTestJava
 ./gradlew build
+bash .github/scripts/check-nullness.sh
 ```
+
+The CI verification script compiles a valid fixture and requires intentional
+null returns, nullable dereferences, generic nullness mismatches, and missing
+null contracts to fail with their expected checker diagnostics. These fixtures
+live under `src/nullnessCheck` and are not application or test source sets.
+They use the same Error Prone options and processor classpath as normal Java
+compilation. Directly running either invalid fixture task is expected to fail.
+
+GitHub Actions are pinned to full commit SHAs. Dependabot checks for action
+updates weekly on Monday at 09:00 Asia/Seoul. The configuration takes effect
+after `.github/dependabot.yml` reaches the default branch.
 
 Each handwritten Java package declares `@NullMarked` in `package-info.java`.
 Use `@Nullable` for values that can be absent and check them before dereferencing.
