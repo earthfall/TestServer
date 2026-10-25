@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: classpath:http-clients.yml
   main:
     lazy-initialization: true
   threads:
@@ -8,6 +10,10 @@ spring:
 test:
   id: 2
   greeting: Test
+
+firebase:
+  api-url: http://localhost/send
+  server-key: test-key
 
 amazon:
   aws:

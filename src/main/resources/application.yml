@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: classpath:http-clients.yml
   threads:
     virtual:
       enabled: true
@@ -16,7 +18,8 @@ test:
   greeting: Hello
 
 firebase:
-  api-url: https://fcm.googleapis.com/fcm/send
+  api-url: ${FIREBASE_API_URL:https://fcm.googleapis.com/fcm/send}
+  server-key: ${FIREBASE_SERVER_KEY:}
 
 management:
   server:
