@@ -1,21 +1,15 @@
 package org.example.event;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Log4j2
 @Component
-@RequiredArgsConstructor
-public class CustomEventListener implements InitializingBean {
+public class CustomEventListener {
 
-    @Autowired
-    private final ReactiveEventPublisher eventPublisher;
-
-    @Override
-    public void afterPropertiesSet() {
-        eventPublisher.subscribe(it -> log.debug("received {}", it));
+    @EventListener
+    public void onCustomEvent(CustomEvent event) {
+        log.debug("received {}", event);
     }
 }

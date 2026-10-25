@@ -10,7 +10,6 @@ import org.example.aop.annotations.HasPermission;
 import org.example.aop.annotations.User;
 import org.example.security.SecurityEvaluator;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -25,16 +24,13 @@ public class SecurityAspect {
     private final SecurityEvaluator securityEvaluator;
 
     @Around(value = "@annotation(hasPermission)", argNames = "hasPermission")
-    public <T> Mono<T> handlePermission(ProceedingJoinPoint joinPoint, HasPermission hasPermission) {
+    public Object handlePermission(ProceedingJoinPoint joinPoint, HasPermission hasPermission) throws Throwable {
         var permission = hasPermission.value();
         var signature = (MethodSignature) joinPoint.getSignature();
         var user = getUser(signature.getMethod(), joinPoint.getArgs());
 
-        return securityEvaluator.confirmPermission(
-            user,
-            permission,
-            () -> proceed(joinPoint)
-        );
+        securityEvaluator.checkPermission(user, permission);
+        return joinPoint.proceed();
     }
 
     private String getUser(Method method, Object[] args) {
@@ -52,12 +48,4 @@ public class SecurityAspect {
             .anyMatch(anno -> anno instanceof User);
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> Mono<T> proceed(ProceedingJoinPoint joinPoint) {
-        try {
-            return (Mono<T>) joinPoint.proceed();
-        } catch (Throwable e) {
-            return Mono.error(new RuntimeException(e));
-        }
-    }
 }

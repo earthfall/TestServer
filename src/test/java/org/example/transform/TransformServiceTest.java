@@ -1,18 +1,12 @@
 package org.example.transform;
 
-import org.example.config.FirebaseProperties;
-import org.example.push.DeviceNotificationService;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@WebFluxTest({DeviceNotificationService.class, Transformer.class, FirebaseProperties.class})
 public class TransformServiceTest {
 
-    @Autowired
-    private Transformer transformer;
+    private final Transformer transformer = new Transformer();
 
     @Test
     public void testTransform() {

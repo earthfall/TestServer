@@ -2,31 +2,26 @@ package org.example.security;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.test.StepVerifier;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureWebTestClient
+@AutoConfigureMockMvc
 public class SecurityControllerIntTest {
 
     @Autowired
-    private WebTestClient webClient;
+    private MockMvc mockMvc;
 
     @Test
-    public void testEvaluatorAop() {
-        StepVerifier.create(
-                webClient.get()
-                    .uri("/permission-aop/world")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .exchange()
-                    .expectStatus().isForbidden()
-                    .returnResult(String.class)
-                    .getResponseBody()
-            )
-            .expectNext("world does not have permission: test1")
-            .verifyComplete();
+    public void testEvaluatorAop() throws Exception {
+        mockMvc.perform(get("/permission-aop/world").accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden())
+            .andExpect(content().string("world does not have permission: test1"));
     }
 }
