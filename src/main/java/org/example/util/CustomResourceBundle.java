@@ -1,9 +1,7 @@
 package org.example.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
+import tools.jackson.databind.json.JsonMapper;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -16,9 +14,8 @@ class CustomResourceBundle extends ResourceBundle {
     private final Enumeration<String> keyEnumeration;
 
     @SuppressWarnings("unchecked")
-    @SneakyThrows(IOException.class)
     CustomResourceBundle(InputStream is) {
-        var objectMapper = new ObjectMapper();
+        var objectMapper = JsonMapper.builder().build();
         resources = objectMapper.readValue(is, Map.class);
         keyEnumeration = Collections.enumeration(resources.keySet());
     }
