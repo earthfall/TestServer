@@ -8,7 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 import org.example.security.model.Message;
 
@@ -21,7 +20,7 @@ public class SecurityController {
     private final SecurityEvaluator securityEvaluator;
 
     @GetMapping("/permission/{name}")
-    public Mono<String> hello(@PathVariable String name) {
+    public String hello(@PathVariable String name) {
         return securityEvaluator.confirmPermission(
             name,
             "test1",
@@ -30,7 +29,7 @@ public class SecurityController {
     }
 
     @GetMapping("/permission-valid/{name}")
-    public Mono<String> validHello(@PathVariable String name) {
+    public String validHello(@PathVariable String name) {
         return securityEvaluator.confirmPermission(
             name,
             UserService.PERMISSION,
@@ -40,17 +39,14 @@ public class SecurityController {
 
     @HasPermission("test1")
     @GetMapping("/permission-aop/{name}")
-    public Mono<String> helloAop(@User @PathVariable String name) {
+    public String helloAop(@User @PathVariable String name) {
         log.debug("Received aop request with " + name);
         return securityService.testHello();
     }
 
     @GetMapping(value = "/permission-valid/{name}", produces = MediaType.APPLICATION_PROTOBUF_VALUE)
-    public Mono<Message> helloAopProto(@User @PathVariable String name) {
+    public Message helloAopProto(@User @PathVariable String name) {
         log.debug("Received protobuf request with " + name);
-        return securityService.testHello()
-            .map(it ->
-                Message.newBuilder().setName(it).build()
-            );
+        return Message.newBuilder().setName(securityService.testHello()).build();
     }
 }

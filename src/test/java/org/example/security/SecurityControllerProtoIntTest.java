@@ -3,28 +3,31 @@ package org.example.security;
 import org.example.security.model.Message;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureWebTestClient
+@AutoConfigureMockMvc
 public class SecurityControllerProtoIntTest {
 
     @Autowired
-    private WebTestClient webClient;
+    private MockMvc mockMvc;
 
     @Test
-    public void testProto() {
-        webClient.get()
-            .uri("/permission-valid/world")
-            .accept(MediaType.APPLICATION_PROTOBUF)
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody(Message.class)
-            .isEqualTo(
-                Message.newBuilder().setName("This hello").build()
-            );
+    public void testProto() throws Exception {
+        var result = mockMvc.perform(get("/permission-valid/world").accept(MediaType.APPLICATION_PROTOBUF))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROTOBUF))
+            .andReturn();
+
+        assertThat(Message.parseFrom(result.getResponse().getContentAsByteArray()))
+            .isEqualTo(Message.newBuilder().setName("This hello").build());
     }
 }

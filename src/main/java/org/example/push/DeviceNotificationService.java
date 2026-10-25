@@ -1,26 +1,29 @@
 package org.example.push;
 
-import lombok.RequiredArgsConstructor;
 import org.example.config.FirebaseProperties;
 import org.example.push.entity.PushEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.RestClient;
 
-@RequiredArgsConstructor
 @Service
 public class DeviceNotificationService {
 
     private final FirebaseProperties firebaseProperties;
+    private final RestClient restClient;
 
-    public Mono<PushEntity> send(PushEntity entity) {
-        return WebClient.create()
+    public DeviceNotificationService(FirebaseProperties firebaseProperties, RestClient.Builder builder) {
+        this.firebaseProperties = firebaseProperties;
+        this.restClient = builder.build();
+    }
+
+    public PushEntity send(PushEntity entity) {
+        return restClient
             .post()
             .uri(firebaseProperties.apiUrl())
             .header("Authorization", "key=" + firebaseProperties.serverKey())
             .header("Content-Type", "application/json")
-            .bodyValue(entity)
+            .body(entity)
             .retrieve()
-            .bodyToMono(PushEntity.class);
+            .body(PushEntity.class);
     }
 }

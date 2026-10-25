@@ -1,8 +1,7 @@
 spring:
-  rsocket:
-    server:
-      transport: websocket
-      mapping-path: /
+  threads:
+    virtual:
+      enabled: true
 
 amazon:
   aws:

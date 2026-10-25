@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @RestController
@@ -52,7 +51,7 @@ public class SampleController {
     }
 
     @PostMapping("/send")
-    public Mono<PushEntity> send() {
+    public PushEntity send() {
         var entity = PushEntity.builder()
             .notification(PushNotificationEntity.builder()
                 .title("humanpoc notification")
