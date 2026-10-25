@@ -14,12 +14,13 @@ assert_rejected() {
         exit 1
     fi
     for diagnostic in "$@"; do
-        if ! grep -F "$diagnostic" "$log"; then
+        if ! grep -Fq "$diagnostic" "$log"; then
             cat "$log"
             echo "Missing expected compiler diagnostic: $diagnostic" >&2
             exit 1
         fi
     done
+    echo "Verified expected compiler rejection: $task"
 }
 
 assert_rejected compileInvalidNullnessFixture \
