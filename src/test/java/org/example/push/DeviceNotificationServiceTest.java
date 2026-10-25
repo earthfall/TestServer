@@ -1,6 +1,7 @@
 package org.example.push;
 
 import org.example.push.entity.PushEntity;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
@@ -33,7 +35,7 @@ class DeviceNotificationServiceTest {
 
     @BeforeEach
     void resetServer() {
-        server = mockServer.server;
+        server = requireNonNull(mockServer.server);
         server.reset();
     }
 
@@ -53,9 +55,11 @@ class DeviceNotificationServiceTest {
 
         assertThat(result.to()).isEqualTo("device");
         assertThat(result.priority()).isEqualTo("high");
-        assertThat(result.notification().title()).isEqualTo("title");
-        assertThat(result.notification().body()).isEqualTo("message");
-        assertThat(result.data().entry()).isEqualTo("value");
+        var notification = requireNonNull(result.notification());
+        var data = requireNonNull(result.data());
+        assertThat(notification.title()).isEqualTo("title");
+        assertThat(notification.body()).isEqualTo("message");
+        assertThat(data.entry()).isEqualTo("value");
         server.verify();
     }
 
@@ -69,7 +73,7 @@ class DeviceNotificationServiceTest {
     }
 
     static class ClientMockServer {
-        private MockRestServiceServer server;
+        private @Nullable MockRestServiceServer server;
     }
 
     @TestConfiguration(proxyBeanMethods = false)
