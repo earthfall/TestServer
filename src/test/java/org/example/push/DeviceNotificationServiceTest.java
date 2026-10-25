@@ -34,11 +34,11 @@ class DeviceNotificationServiceTest {
 
         var result = service.send(PushEntity.builder().to("device").priority("high").build());
 
-        assertThat(result.getTo()).isEqualTo("device");
-        assertThat(result.getPriority()).isEqualTo("high");
-        assertThat(result.getNotification().getTitle()).isEqualTo("title");
-        assertThat(result.getNotification().getBody()).isEqualTo("message");
-        assertThat(result.getData().getEntry()).isEqualTo("value");
+        assertThat(result.to()).isEqualTo("device");
+        assertThat(result.priority()).isEqualTo("high");
+        assertThat(result.notification().title()).isEqualTo("title");
+        assertThat(result.notification().body()).isEqualTo("message");
+        assertThat(result.data().entry()).isEqualTo("value");
         server.verify();
     }
 
