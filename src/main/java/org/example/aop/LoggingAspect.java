@@ -17,7 +17,7 @@ public class LoggingAspect {
         // empty
     }
 
-    @Pointcut("@within(org.example.aop.annotations.LogRequest)")
+    @Pointcut("@within(org.example.annotation.LogRequest)")
     private void annotatedWithLogRequest() {
         // empty
     }

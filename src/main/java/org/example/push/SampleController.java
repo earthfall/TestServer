@@ -1,7 +1,7 @@
 package org.example.push;
 
 import lombok.RequiredArgsConstructor;
-import org.example.aop.annotations.LogRequest;
+import org.example.annotation.LogRequest;
 import org.example.config.AppProperties;
 import org.example.push.entity.PushDataEntity;
 import org.example.push.entity.PushEntity;

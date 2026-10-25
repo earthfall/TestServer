@@ -1,6 +1,5 @@
-package org.example.config;
+package org.example.push;
 
-import org.example.push.FirebaseClient;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.service.registry.ImportHttpServices;
 
