@@ -38,7 +38,7 @@ public class SecurityAspect {
         var annotations = method.getParameterAnnotations();
         for (int i = 0; i < method.getParameterCount(); i++) {
             if (hasUserAnnotation(annotations[i])) {
-                return (String) args[i];
+                return args[i] instanceof String user ? user : null;
             }
         }
         return null;

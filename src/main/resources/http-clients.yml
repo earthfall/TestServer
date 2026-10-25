@@ -3,6 +3,5 @@ spring:
     serviceclient:
       firebase:
         base-url: "${firebase.api-url}"
-        default-header:
-          Authorization:
-            - "key=${firebase.server-key}"
+        connect-timeout: 2s
+        read-timeout: 5s

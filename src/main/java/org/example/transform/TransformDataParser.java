@@ -1,70 +1,68 @@
 package org.example.transform;
 
-import org.jspecify.annotations.Nullable;
-import lombok.SneakyThrows;
 import org.example.annotation.TransformData;
+import org.jspecify.annotations.Nullable;
 
-import java.lang.invoke.LambdaMetafactory;
-import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class TransformDataParser {
-
     private TransformDataParser() {
     }
 
-    @SuppressWarnings("unchecked")
-    @SneakyThrows(Throwable.class)
     static Supplier<Transformable<?>> transformConstructor(Class<?> clazz) {
-        var lookup = MethodHandles.lookup();
-
-        MethodHandle mh = lookup.findConstructor(clazz, MethodType.methodType(void.class));
-        return (Supplier<Transformable<?>>) LambdaMetafactory.metafactory(
-                lookup,
-                "get",
-                MethodType.methodType(Supplier.class),
-                mh.type().generic(),
-                mh,
-                mh.type()
-            )
-            .getTarget()
-            .invokeExact();
+        try {
+            var lookup = MethodHandles.privateLookupIn(clazz, MethodHandles.lookup());
+            var constructor = lookup.findConstructor(clazz, MethodType.methodType(void.class));
+            return () -> {
+                try {
+                    return (Transformable<?>) constructor.invoke();
+                } catch (Error error) {
+                    throw error;
+                } catch (Throwable exception) {
+                    throw new TransformException("Cannot construct " + clazz.getName(), exception);
+                }
+            };
+        } catch (ReflectiveOperationException exception) {
+            throw new TransformException("Transformable type requires an accessible no-argument constructor: "
+                + clazz.getName(), exception);
+        }
     }
 
-    @SneakyThrows(IllegalAccessException.class)
     static Set<TransformItem> transformDataInfo(Class<?> clazz) {
-        var handle = MethodHandles.lookup();
-        var privateLookup = MethodHandles.privateLookupIn(clazz, handle);
-
-        return getAllFields(clazz).stream()
-            .map(field -> transformItem(privateLookup, field))
-            .collect(Collectors.toSet());
-    }
-
-    @SneakyThrows(IllegalAccessException.class)
-    private static TransformItem transformItem(MethodHandles.Lookup privateLookup, Field field) {
-        return new TransformItem(privateLookup.unreflectVarHandle(field), hasTransformDataAnnotation(field));
+        var items = new LinkedHashSet<TransformItem>();
+        for (var field : getAllFields(clazz)) {
+            if (Modifier.isStatic(field.getModifiers()) || field.isSynthetic()) {
+                continue;
+            }
+            if (Modifier.isFinal(field.getModifiers())) {
+                throw new TransformException("Final instance field is not supported: "
+                    + field.getDeclaringClass().getName() + "." + field.getName());
+            }
+            try {
+                var lookup = MethodHandles.privateLookupIn(field.getDeclaringClass(), MethodHandles.lookup());
+                items.add(new TransformItem(lookup.unreflectVarHandle(field),
+                    field.isAnnotationPresent(TransformData.class)));
+            } catch (IllegalAccessException exception) {
+                throw new TransformException("Cannot access field " + field, exception);
+            }
+        }
+        return Set.copyOf(items);
     }
 
     private static List<Field> getAllFields(@Nullable Class<?> clazz) {
-        if (clazz == null) {
-            return Collections.emptyList();
+        if (clazz == null || clazz == Object.class) {
+            return List.of();
         }
-
-        List<Field> result = new ArrayList<>(getAllFields(clazz.getSuperclass()));
-        result.addAll(List.of(clazz.getDeclaredFields()));
-        return result;
-    }
-
-    private static boolean hasTransformDataAnnotation(Field field) {
-        return field.isAnnotationPresent(TransformData.class);
+        var fields = new ArrayList<>(getAllFields(clazz.getSuperclass()));
+        fields.addAll(List.of(clazz.getDeclaredFields()));
+        return fields;
     }
 }

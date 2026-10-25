@@ -12,13 +12,10 @@ test:
   greeting: Test
 
 firebase:
-  api-url: http://localhost/send
-  server-key: test-key
+  project-id: test-project
+  api-url: http://localhost
 
 amazon:
-  aws:
-    access-key: "test-key"
-    secret-key: "test-secret"
-  dynamodb:
+  dynamo-db:
     endpoint: http://localhost:8000
     region: us-east-1
