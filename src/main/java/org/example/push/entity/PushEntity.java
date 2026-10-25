@@ -1,12 +1,13 @@
 package org.example.push.entity;
 
 import lombok.Builder;
+import org.jspecify.annotations.Nullable;
 
 @Builder
 public record PushEntity(
-    PushNotificationEntity notification,
-    PushDataEntity data,
+    @Nullable PushNotificationEntity notification,
+    @Nullable PushDataEntity data,
     String to,
-    String priority
+    @Nullable String priority
 ) {
 }

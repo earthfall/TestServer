@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'net.ltgt.errorprone' version '5.1.1'
     id 'org.springframework.boot' version '4.1.2'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.asciidoctor.jvm.convert' version '4.0.5'
@@ -34,6 +35,9 @@ ext {
 }
 
 dependencies {
+    errorprone 'com.google.errorprone:error_prone_core:2.50.0'
+    errorprone 'com.uber.nullaway:nullaway:0.14.2'
+    implementation 'org.jspecify:jspecify:1.0.0'
     implementation platform('software.amazon.awssdk:bom:2.57.3')
     implementation platform('org.springframework.modulith:spring-modulith-bom:2.1.1')
 
@@ -67,6 +71,17 @@ dependencies {
     testImplementation 'org.assertj:assertj-core'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.errorprone {
+        disableAllChecks = true
+        error('NullAway', 'JSpecifyUnrecognizedAnnotationLocation')
+        option('NullAway:OnlyNullMarked', 'true')
+        option('NullAway:JSpecifyMode', 'true')
+        // Protobuf and Spring AOT sources are generated under build/.
+        excludedPaths = '.*/build/.*'
+    }
 }
 
 protobuf {
