@@ -24,6 +24,9 @@ Prepare a separate DynamoDB Local server before invoking actual database operati
 
 ## Run tests
 
+Static API specifications are generated from code during the build. See the
+[OpenAPI guide](OpenApi.md) for JSON, YAML, and generation commands.
+
 ```powershell
 .\gradlew.bat build
 ```
