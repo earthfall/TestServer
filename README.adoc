@@ -1,3 +1,5 @@
 = TestServer
 
 This project is intended for deployment test of spring boot artifact.
+
+See the link:src/main/doc/GettingStarted.md[getting-started guide] for local setup, tests, container verification, and implementation scope.

@@ -1,38 +1,55 @@
-# Java 25 AOT cache in Docker
+# Container builds and AOT scope
 
-The Dockerfile builds the executable JAR, extracts Spring Boot layers, and
-generates `app.aot` in the final Java 25 runtime image. Training and startup
-use the same JVM, `/app` working directory, user, and extracted classpath.
+Container images are built with Spring Boot Cloud Native Buildpacks. Jib and
+Dockerfile-based image builds have been removed.
 
-```sh
-docker build -t testserver:0.1.0 .
-docker run --rm -p 8080:8080 testserver:0.1.0
-```
+## Build and run
 
-Training uses `-XX:AOTCacheOutput=app.aot` and
-`-Dspring.context.exit=onRefresh` to exit after Spring context refresh.
-Normal startup uses `-XX:AOTCache=app.aot` without the exit property.
-This enables the JVM AOT cache; it does not enable Spring AOT processing
-at runtime with `spring.aot.enabled`.
-
-Rebuild the image after changing the application, dependencies, or base JVM.
-Do not copy a cache from Windows or another JVM build into the image.
-When adding profiles or startup integrations, ensure that the training run
-can initialize the application without production credentials or external
-services. Changing JVM options can also affect cache compatibility.
-
-To inspect cache loading:
+Install JDK 25 and run a Docker daemon with Linux container support:
 
 ```sh
-docker run --rm -e JAVA_TOOL_OPTIONS=-Xlog:aot=info testserver:0.1.0
+./gradlew bootBuildImage
+docker run --rm -p 127.0.0.1:8080:8080 -p 127.0.0.1:8081:8081 testserver/testserver:0.1.0
 ```
 
-Look for `Opened AOT cache` and `Using AOT-linked classes: true`.
-Some classes may be skipped during training; inspect cache-load diagnostics
-and measure readiness and first-request latency in the target environment.
+On Windows, use `.\gradlew.bat bootBuildImage`.
+The task uses the Paketo Noble Java Tiny builder and requests Java 25 explicitly.
+`BP_NATIVE_IMAGE=false` selects a JVM image even when GraalVM build tooling is present.
+The builder supplies the runtime and non-root launch user; no custom Dockerfile is needed.
+Building requires network access to fetch builder/run images and buildpack dependencies.
+The builder's `latest` tag receives updates, so rebuilds may use newer builder contents.
 
-Local Windows validation confirmed layered extraction, cache generation,
-cache loading, and Spring context initialization on Java 25. Docker image
-build and execution have not been tested in this environment.
+Override the image name when needed:
 
-Reference: [Spring Boot Dockerfiles](https://docs.spring.io/spring-boot/reference/packaging/container-images/dockerfiles.html).
+```sh
+./gradlew bootBuildImage --imageName=testserver:smoke
+bash .github/scripts/check-container.sh
+```
+
+The smoke test builds and runs the image, checks health and core API responses,
+and removes its temporary container. It does not send real Firebase notifications.
+
+## JVM AOT cache
+
+`bootBuildImage` sets `BP_JVM_AOTCACHE_ENABLED=true` alongside Java 25.
+The Paketo Spring Boot buildpack trains the application during image creation,
+stores the resulting JVM AOT cache in the image, and configures cache loading at launch.
+No host-generated cache or custom Dockerfile training step is required.
+Training must be able to initialize the application without production credentials
+or external services. Firebase credentials are resolved lazily on the first send.
+
+The container smoke test sets `-XX:AOTMode=on -Xlog:aot=info` and requires the JVM
+to report `Using AOT-linked classes: true`, in addition to passing health and API checks.
+This prevents a silently disabled cache from passing CI.
+Run `bash .github/scripts/check-container.sh` to verify the actual image.
+Image creation and cache loading have not been verified locally because Docker is unavailable.
+
+To disable cache loading temporarily for comparison, launch with
+`-e BPL_JVM_AOTCACHE_ENABLED=false`. Rebuild after application or runtime changes;
+do not reuse caches across JVM versions, architectures, or different application layouts.
+Spring AOT processing and GraalVM native-image compilation are separate mechanisms;
+this configuration requests a JVM image, not a native executable.
+Measure startup and first-request latency before claiming a performance improvement.
+
+Reference: [Spring Boot OCI image packaging](https://docs.spring.io/spring-boot/gradle-plugin/packaging-oci-image.html).
+Cache settings: [Paketo Spring Boot buildpack](https://github.com/paketo-buildpacks/spring-boot).
