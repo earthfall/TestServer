@@ -5,7 +5,6 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.7'
     id 'org.asciidoctor.jvm.convert' version '4.0.5'
     id 'com.google.protobuf' version '0.9.4'
-    id 'com.google.cloud.tools.jib' version '3.4.5'
     id 'org.graalvm.buildtools.native' version '0.11.1'
 }
 
@@ -118,12 +117,8 @@ tasks.named('asciidoctor') {
     dependsOn test
 }
 
-jib {
-    from.image = 'eclipse-temurin:25-jre'
-    to.image = "${project.group}/${bootJar.archiveBaseName}"
-    container {
-        args = ['-Djava.security.egd=file:/dev/./urandom']
-        ports = ['8080']
-        format = 'OCI'
-    }
+tasks.named('bootBuildImage') {
+    imageName = "testserver/${project.name.toLowerCase(java.util.Locale.ROOT)}:${project.version}"
+    builder = 'paketobuildpacks/builder-noble-java-tiny:latest'
+    environment = ['BP_JVM_VERSION': '25', 'BP_NATIVE_IMAGE': 'false']
 }

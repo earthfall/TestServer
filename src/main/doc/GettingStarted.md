@@ -41,7 +41,7 @@ bash .github/scripts/check-nullness.sh
 bash .github/scripts/check-container.sh
 ```
 
-The second command requires Docker and curl. It builds the image, checks health,
+The second command requires JDK 25, Docker, and curl. It uses Spring Boot Buildpacks. It builds the image, checks health,
 the greeting endpoint, and permission allow/deny responses in a temporary container,
 then removes the container. Host ports are assigned dynamically and bound only to
 loopback. GitHub Actions runs the same checks after building and testing the project.
@@ -65,8 +65,8 @@ Google authentication.
 * The permission example compares a fixed string and has no per-user permission store.
 * Protobuf is a serialization format. Transport encryption depends on deployment TLS settings.
 * Spring events run synchronously on the publishing thread.
-* The Dockerfile provides a deployment path with layer extraction and JVM AOT caching.
-  Jib is a separate image-building path and does not run the Dockerfile's AOT training.
+* Container images are built with Spring Boot Buildpacks using `bootBuildImage`.
+  See [container builds and AOT scope](AotCache.md) for commands and limitations.
 * Enabling virtual threads does not establish a measured performance improvement.
   Compare throughput, p95 latency, and error rates with virtual threads enabled and disabled,
   using identical mock upstream delays, concurrency, and JVM resources.
