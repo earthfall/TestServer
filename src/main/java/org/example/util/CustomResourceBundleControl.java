@@ -10,7 +10,7 @@ import java.util.ResourceBundle;
 class CustomResourceBundleControl extends ResourceBundle.Control {
 
     @Override
-    public List<String> getFormats(String baseName) {
+    public List<String> getFormats(@Nullable String baseName) {
         if (baseName == null) {
             throw new IllegalArgumentException("No basename specified");
         }
@@ -19,10 +19,6 @@ class CustomResourceBundleControl extends ResourceBundle.Control {
 
     @Override
     public @Nullable ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload) throws IllegalAccessException, InstantiationException, IOException {
-        if (baseName == null || locale == null || format == null || loader == null) {
-            throw new IllegalArgumentException("Wrong bundle parameter");
-        }
-
         if (!format.equals("json")) {
             return null;
         }
@@ -35,21 +31,13 @@ class CustomResourceBundleControl extends ResourceBundle.Control {
         }
 
         var connection = url.openConnection();
-        if (connection == null) {
-            return null;
-        }
-
         if (reload) {
             // disable caches if reloading
             connection.setUseCaches(false);
         }
 
         try (var stream = connection.getInputStream()) {
-            if (stream != null) {
-                return new CustomResourceBundle(new BufferedInputStream(stream));
-            }
+            return new CustomResourceBundle(new BufferedInputStream(stream));
         }
-
-        return null;
     }
 }
