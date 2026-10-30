@@ -3,7 +3,7 @@ set -euo pipefail
 
 image="${1:-testserver:smoke}"
 ./gradlew bootBuildImage --imageName="$image" --console=plain
-container="$(docker run -d -p 127.0.0.1::8080 -p 127.0.0.1::8081 "$image")"
+container="$(docker run -d -e JAVA_TOOL_OPTIONS='-XX:AOTMode=on -Xlog:aot=info' -p 127.0.0.1::8080 -p 127.0.0.1::8081 "$image")"
 cleanup() {
     docker logs "$container" || true
     docker rm -f "$container" >/dev/null
@@ -27,4 +27,8 @@ fi
 [[ "$(curl --fail --silent -H 'Accept: application/json' "http://127.0.0.1:$app_port/permission-valid/smoke")" == 'This hello' ]]
 status="$(curl --silent --output /dev/null --write-out '%{http_code}' "http://127.0.0.1:$app_port/permission/smoke")"
 [[ "$status" == 403 ]]
-echo 'Container health, greeting, permission allow and deny checks passed'
+if ! docker logs "$container" 2>&1 | grep -F 'Using AOT-linked classes: true' > /dev/null; then
+    echo 'JVM did not report using AOT-linked classes' >&2
+    exit 1
+fi
+echo 'Container health, API contracts, and JVM AOT cache loading checks passed'

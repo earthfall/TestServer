@@ -29,13 +29,27 @@ bash .github/scripts/check-container.sh
 The smoke test builds and runs the image, checks health and core API responses,
 and removes its temporary container. It does not send real Firebase notifications.
 
-## AOT scope
+## JVM AOT cache
 
-The previous Dockerfile explicitly trained and loaded a Java 25 JVM AOT cache.
-That custom training step is no longer configured. Do not assume that the new image
-loads the previous `app.aot` cache or preserves its startup performance.
+`bootBuildImage` sets `BP_JVM_AOTCACHE_ENABLED=true` alongside Java 25.
+The Paketo Spring Boot buildpack trains the application during image creation,
+stores the resulting JVM AOT cache in the image, and configures cache loading at launch.
+No host-generated cache or custom Dockerfile training step is required.
+Training must be able to initialize the application without production credentials
+or external services. Firebase credentials are resolved lazily on the first send.
+
+The container smoke test sets `-XX:AOTMode=on -Xlog:aot=info` and requires the JVM
+to report `Using AOT-linked classes: true`, in addition to passing health and API checks.
+This prevents a silently disabled cache from passing CI.
+Run `bash .github/scripts/check-container.sh` to verify the actual image.
+Image creation and cache loading have not been verified locally because Docker is unavailable.
+
+To disable cache loading temporarily for comparison, launch with
+`-e BPL_JVM_AOTCACHE_ENABLED=false`. Rebuild after application or runtime changes;
+do not reuse caches across JVM versions, architectures, or different application layouts.
 Spring AOT processing and GraalVM native-image compilation are separate mechanisms;
 this configuration requests a JVM image, not a native executable.
-Any future AOT optimization must be configured and measured with the selected buildpack.
+Measure startup and first-request latency before claiming a performance improvement.
 
 Reference: [Spring Boot OCI image packaging](https://docs.spring.io/spring-boot/gradle-plugin/packaging-oci-image.html).
+Cache settings: [Paketo Spring Boot buildpack](https://github.com/paketo-buildpacks/spring-boot).
