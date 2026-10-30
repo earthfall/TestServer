@@ -120,6 +120,8 @@ tasks.named('asciidoctor') {
 tasks.named('bootBuildImage') {
     imageName = "testserver/${project.name.toLowerCase(java.util.Locale.ROOT)}:${project.version}"
     builder = 'paketobuildpacks/builder-noble-java-tiny:latest'
+    // Override the native-image buildpack order contributed by GraalVM tooling.
+    buildpacks = ['urn:cnb:builder:paketo-buildpacks/java']
     environment = [
         'BP_JVM_VERSION': '25',
         'BP_NATIVE_IMAGE': 'false',
