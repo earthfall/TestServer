@@ -52,6 +52,7 @@ dependencies {
     }
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    testImplementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:3.2.0'
     implementation 'com.google.auth:google-auth-library-oauth2-http:1.43.0'
 
     implementation 'tools.jackson.core:jackson-databind'
@@ -109,6 +110,24 @@ protobuf {
 tasks.named('test') {
     outputs.dir snippetsDir
     useJUnitPlatform()
+    exclude '**/OpenApiIntTest.class'
+}
+
+tasks.register('generateOpenApi', Test) {
+    group = 'documentation'
+    description = 'Generate static OpenAPI JSON and YAML from application code'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform()
+    include '**/OpenApiIntTest.class'
+    def outputDir = layout.buildDirectory.dir('openapi')
+    systemProperty 'openapi.outputDir', outputDir.get().asFile.absolutePath
+    outputs.dir(outputDir)
+    outputs.upToDateWhen { false }
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('generateOpenApi')
 }
 
 tasks.named('asciidoctor') {
